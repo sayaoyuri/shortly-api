@@ -1,13 +1,13 @@
 {
-  "name": "express-ts-api-template",
-  "version": "1.0.0",
+  "name": "shortly-api",
+  "version": "1.1.0",
   "description": "",
   "main": "./dist/src/server.js",
   "scripts": {
     "precommit": "lint-staged",
     "build": "tsc && tsc-alias -p tsconfig.build.json",
     "migration:prod": "prisma migrate deploy",
-    "start": "npm run migration:prod && node ./dist/src/server.js",
+    "start": "node ./dist/src/server.js",
     "dev:load-env": "dotenv -e .env.development",
     "test:load-env": "dotenv -e .env.test",
     "dev:migration:run": "npm run dev:load-env prisma migrate deploy",
