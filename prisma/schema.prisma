@@ -7,16 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model sessions {
+model Session {
   id        Int      @id @default(autoincrement())
   userId    Int?     @map("user_id")
   token     String   @unique @db.VarChar
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
   updateAt  DateTime @default(now()) @map("update_at") @db.Timestamp(6)
-  users     users?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sessions_userId_fkey")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sessions_userId_fkey")
+
+  @@map("sessions")
 }
 
-model urls {
+model Url {
   id         Int      @id @default(autoincrement())
   ownerId    Int      @map("owner_id")
   url        String   @db.VarChar
@@ -24,16 +26,20 @@ model urls {
   visitCount Int      @default(0) @map("visit_count")
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(6)
   updateAt   DateTime @default(now()) @map("update_at") @db.Timestamp(6)
-  users      users    @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "urls_ownerId_fkey")
+  user       User     @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "urls_ownerId_fkey")
+
+  @@map("urls")
 }
 
-model users {
-  id        Int        @id @default(autoincrement())
-  name      String     @db.VarChar(30)
-  email     String     @unique @db.VarChar(100)
-  password  String     @db.VarChar(150)
-  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
-  updateAt  DateTime   @default(now()) @map("update_at") @db.Timestamp(6)
-  sessions  sessions[]
-  urls      urls[]
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(30)
+  email     String    @unique @db.VarChar(100)
+  password  String    @db.VarChar(150)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updateAt  DateTime  @default(now()) @map("update_at") @db.Timestamp(6)
+  sessions  Session[]
+  urls      Url[]
+
+  @@map("users")
 }
