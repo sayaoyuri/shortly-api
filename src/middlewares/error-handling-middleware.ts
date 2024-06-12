@@ -20,6 +20,12 @@ export function handleApplicationError(
     });
   }
 
+  if (error.name === 'ConflictError') {
+    return res.status(httpStatus.CONFLICT).send({
+      message: error.message,
+    });
+  }
+
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
     message: 'Internal Server Error',
   });
