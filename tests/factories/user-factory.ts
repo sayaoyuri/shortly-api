@@ -1,10 +1,17 @@
 import { faker } from '@faker-js/faker';
 import { User } from '@prisma/client';
 import { prisma } from '@/config';
-import { UserRequest } from '@/protocols';
+import { UserBody, UserRequest } from '@/protocols';
+import { userService } from '@/services';
 
 async function createUser(): Promise<User> {
-  const user = mockUserRequest();
+  const mockUser = mockUserRequest();
+
+  const user: UserBody = {
+    name: mockUser.name,
+    email: mockUser.email,
+    password: userService.encryptPassword(mockUser.confirmPassword),
+  };
 
   return await prisma.user.create({
     data: user,
