@@ -26,6 +26,12 @@ export function handleApplicationError(
     });
   }
 
+  if (error.name === 'SessionAuthError' || error.name === 'JsonWebTokenError') {
+    return res.status(httpStatus.UNAUTHORIZED).send({
+      message: error.message,
+    });
+  }
+
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
     message: 'Internal Server Error',
   });
