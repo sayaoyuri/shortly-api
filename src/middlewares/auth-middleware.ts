@@ -6,9 +6,21 @@ import { sessionData, sessionTokenData } from '@/protocols';
 import { sessionRepository } from '@/repositories';
 
 const SECRET_KEY = process.env.SECRET_KEY;
+const TOKEN_MAX_AGE = parseInt(process.env.TOKEN_MAX_AGE);
+
+function tokenConfig() {
+  return {
+    httpOnly: true,
+    maxAge: TOKEN_MAX_AGE,
+  };
+}
 
 function generateToken(data: sessionTokenData) {
   return Jwt.sign(data, SECRET_KEY);
+}
+
+function verifyToken(token: string) {
+  return Jwt.verify(token, SECRET_KEY);
 }
 
 async function saveSession(session: sessionData): Promise<Session> {
@@ -21,12 +33,15 @@ function validateAuthorization() {
 
     if (!sessionToken) throw sessionAuthError();
 
-    if (!Jwt.verify(sessionToken, SECRET_KEY)) throw sessionAuthError();
+    const verifiedToken = verifyToken(sessionToken);
+    if (!verifiedToken) throw sessionAuthError();
 
     if (!(await sessionRepository.readUnique(sessionToken))) throw sessionAuthError();
+
+    res.locals.token = verifiedToken;
 
     next();
   };
 }
 
-export const sessionMiddleware = { generateToken, saveSession, validateAuthorization };
+export const sessionMiddleware = { tokenConfig, generateToken, verifyToken, saveSession, validateAuthorization };

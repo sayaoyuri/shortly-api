@@ -14,7 +14,7 @@ describe('createUser Service', () => {
       return mockUser;
     });
 
-    const result = userService.createUser(mockUser);
+    const result = userService.signUp(mockUser);
     expect(result).rejects.toEqual(conflictError('E-mail'));
   });
 });

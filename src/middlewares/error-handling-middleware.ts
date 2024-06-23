@@ -26,7 +26,7 @@ export function handleApplicationError(
     });
   }
 
-  if (error.name === 'SessionAuthError' || error.name === 'JsonWebTokenError') {
+  if (error.name === 'SessionAuthError' || error.name === 'JsonWebTokenError' || error.name === 'SignInError') {
     return res.status(httpStatus.UNAUTHORIZED).send({
       message: error.message,
     });

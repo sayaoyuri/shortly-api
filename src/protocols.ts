@@ -7,9 +7,11 @@ export type ApplicationError = {
 
 export type UserBody = Pick<User, 'name' | 'email' | 'password'>;
 
-export type UserRequest = UserBody & {
+export type UserSignUpBody = UserBody & {
   confirmPassword: string;
 };
+
+export type UserSignInBody = Pick<User, 'email' | 'password'>;
 
 export type sessionTokenData = Pick<User, 'id' | 'name' | 'email'>;
 

@@ -8,3 +8,9 @@ export function connectDb(): void {
 export async function disconnectDB(): Promise<void> {
   await prisma?.$disconnect();
 }
+
+export async function clearDb(): Promise<void> {
+  await prisma.url.deleteMany({});
+  await prisma.session.deleteMany({});
+  await prisma.user.deleteMany({});
+}

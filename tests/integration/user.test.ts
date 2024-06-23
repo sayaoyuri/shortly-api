@@ -4,14 +4,14 @@ import httpStatus from 'http-status';
 import { userFactory } from '../factories/user-factory';
 import app, { init } from '@/app';
 import { conflictError } from '@/errors';
-import { prisma } from '@/config';
+import { clearDb } from '@/config';
 
 beforeAll(() => {
   init();
 });
 
 beforeEach(async () => {
-  await prisma.user.deleteMany({});
+  await clearDb();
 });
 
 const server = supertest(app);
