@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import httpStatus from 'http-status';
 import { userFactory } from '../factories/user-factory';
 import app, { init } from '@/app';
-import { conflictError } from '@/errors';
+import { conflictError, signInError } from '@/errors';
 import { clearDb } from '@/config';
 
 beforeAll(() => {
@@ -19,14 +19,7 @@ const server = supertest(app);
 describe('POST /user/sign-up', () => {
   describe('SUCCESS', () => {
     it('should respond with status 201 when user is unique', async () => {
-      const password = faker.internet.password();
-
-      const body = {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password,
-        confirmPassword: password,
-      };
+      const body = userFactory.mockUserRequest();
 
       const response = await server.post('/user/sign-up').send(body);
       expect(response.status).toBe(httpStatus.CREATED);
@@ -74,6 +67,56 @@ describe('POST /user/sign-up', () => {
       expect(response.body).toEqual(
         expect.objectContaining({
           message: conflictError('E-mail').message,
+        }),
+      );
+    });
+  });
+});
+
+describe('POST /user/sign-in', () => {
+  describe('SUCCESS', () => {
+    it('should respond with status 200 when sign in is complete', async () => {
+      const { name, email, password } = userFactory.mockUserRequest();
+
+      await userFactory.createUser({ name, email, password });
+
+      const body = { email, password };
+
+      const response = await server.post('/user/sign-in').send(body);
+      expect(response.status).toBe(httpStatus.OK);
+      expect(response.headers['set-cookie']).not.toBe(null);
+      expect(response.headers['set-cookie'][0]).toMatch('sessionToken=');
+    });
+  });
+
+  describe('FAILLURE', () => {
+    it('should respond with status 401 when user does not exist', async () => {
+      const { email, password } = userFactory.mockUserRequest();
+
+      const body = { email, password };
+
+      const response = await server.post('/user/sign-in').send(body);
+      expect(response.status).toBe(httpStatus.UNAUTHORIZED);
+      expect(response.body).toEqual(
+        expect.objectContaining({
+          message: signInError().message,
+        }),
+      );
+    });
+
+    it('should respond with status 401 when user password doesnt match stored password', async () => {
+      const user = await userFactory.createUser();
+
+      const body = {
+        email: user.email,
+        password: faker.internet.password(),
+      };
+
+      const response = await server.post('/user/sign-in').send(body);
+      expect(response.status).toBe(httpStatus.UNAUTHORIZED);
+      expect(response.body).toEqual(
+        expect.objectContaining({
+          message: signInError().message,
         }),
       );
     });

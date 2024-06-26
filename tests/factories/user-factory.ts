@@ -4,13 +4,13 @@ import { prisma } from '@/config';
 import { UserBody, UserSignUpBody } from '@/protocols';
 import { userService } from '@/services';
 
-async function createUser(): Promise<User> {
-  const mockUser = mockUserRequest();
+async function createUser(userData?: UserBody): Promise<User> {
+  const mockUser = userData || mockUserRequest();
 
   const user: UserBody = {
     name: mockUser.name,
     email: mockUser.email,
-    password: userService.encryptPassword(mockUser.confirmPassword),
+    password: userService.encryptPassword(mockUser.password),
   };
 
   return await prisma.user.create({
